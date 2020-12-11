@@ -46,6 +46,32 @@ public class DBUtil {
         }
         return null;
     }
+                                                                        //Varargs
+    //queryWithParam("SELECT * FORM employees", 112, 111) // params = [112, 111]
+
+    /**
+     *queryWithParam("Select * form customers where customerNumber = ? and customerName = ?", 112, "Jason Ltd")
+     * // Select * form customers where customerNumber = 112 and customerName = 'Jason Ltd'
+     *
+     *
+     */
+    public static List<Map<String, Object>> queryWithParam(String query, Object... params) {
+        try {
+            openConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            for(int i = 0; i < params.length; i++) {
+                preparedStatement.setObject(i + 1, params[i]);
+            }
+
+            rs = preparedStatement.executeQuery();
+            return getData();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+        return null;
+    }
 
     private static List<Map<String, Object>> getData() throws SQLException {
         // Map represents 1 row where key is the column name and value is the value in DB under that column for that particular row
