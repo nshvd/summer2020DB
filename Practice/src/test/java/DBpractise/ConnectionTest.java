@@ -18,11 +18,11 @@ public class ConnectionTest {
             statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             rs = statement.executeQuery("" +
                     "SELECT *\n" +
-                    "FROM customers");
+                    "FROM employees\n" +
+                    "WHERE lastName = 'Fixter';");
 
             List<Map<String, Object>> data = getData();
-
-            System.out.println(data.get(6).get("contactLastName"));
+            System.out.println(data);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -45,15 +45,15 @@ public class ConnectionTest {
         List<String> columns = getColumnNames();
         // Loops through the whole result set
         // with each .next() call moves the pointer to the next row
-        while (rs.next()) { //rs.next returns true if the pointer was moved to the new row,
+        while (rs.next()) {//rs.next returns true if the pointer was moved to the new row,
                             // If row doesn't exist (currently pointing to the last row) it will return false
 
             //New HashMap is created for each row
             Map<String, Object> row = new HashMap<>();
 
             // Inner Loop loops through all the column names. We use it to get the data for a specific column within a row
-            for (String column : columns) {
-                row.put(column, rs.getObject(column));
+            for (String columnName : columns) {
+                row.put(columnName, rs.getObject(columnName));
             }
             // After building hashmap it's added to our datatable List
             dataTable.add(row);
