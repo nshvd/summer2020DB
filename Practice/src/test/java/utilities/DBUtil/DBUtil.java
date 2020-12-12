@@ -1,4 +1,4 @@
-package DBUtil;
+package utilities.DBUtil;
 
 import org.junit.Assert;
 import utilities.ConfigReader;
@@ -14,6 +14,8 @@ public class DBUtil {
     private static Statement statement;
     private static ResultSet rs;
     private static final String jdbcLink = ConfigReader.getProperty("jdbcLink");
+
+    private DBUtil(){};
 
     public static void openConnection() {
         try {
