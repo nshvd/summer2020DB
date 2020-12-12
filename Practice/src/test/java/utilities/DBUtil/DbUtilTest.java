@@ -70,7 +70,7 @@ public class DbUtilTest {
     public void test5() {
         // was created by other steps (Data table for UI or retrieved using API)
         // Created from API or DataTable
-        this.fromUI = new CustEmployee("Alpha Cognac", "Gerard", "Hernandez");
+        CustEmployee fromUI = new CustEmployee("Alpha Cognac", "Gerard", "Hernandez");
         CustEmployee fromDB = CustEmployee.getByCustomerName(fromUI.getCustName()).get(0);
         Assert.assertTrue(fromDB != null);
         Assert.assertEquals("Objects are not equal!", fromUI, fromDB);
