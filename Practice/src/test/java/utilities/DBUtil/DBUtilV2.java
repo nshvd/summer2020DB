@@ -13,12 +13,12 @@ import java.util.*;
 public class DBUtilV2 {
     private static Connection connection;
     private static Statement statement;
-    private static final String jdbcLink = ConfigReader.getProperty("jdbcLink");
-    private static BeanProcessor processor = new BeanProcessor();
+    private static final String jdbcLink = ConfigReader.getProperty("jdbcLink"); // In order to establish connection with DB
+    private static BeanProcessor processor = new BeanProcessor(); // Coming form Apache DB Utils and used in order to convert(map) result set to Java Object Beans
 
-    private DBUtilV2() {
-    }
+    private DBUtilV2() {}
 
+    // IN order to open connection with DB
     public static void openConnection() {
         try {
             if (connection == null) connection = DriverManager.getConnection(jdbcLink);
@@ -29,6 +29,7 @@ public class DBUtilV2 {
         }
     }
 
+    // good practise is to always cose the connection explicitly
     public static void closeConnection() {
         try {
             if (statement != null) statement.close();
@@ -38,15 +39,23 @@ public class DBUtilV2 {
         }
     }
 
+    // Sends query to DB and returns a ResultSet Object
+    // String query = SELECT * FORM employees WHERE id = ?
+    // queryToRs(query, 101); - > ? in the query string will be replaced by 101
+    // queryToRs(query, 102); - > ? in the query string will be replaced by 102
     public static ResultSet queryToRs(String query, Object... params) {
         try {
             openConnection();
             if (params.length == 0) return statement.executeQuery(query);
 
+            // Regular JDBC functionality
             PreparedStatement preparedStatement = connection.prepareStatement(query);
+            // For each obj in params array we need to replace ? in query string
             for (int i = 0; i < params.length; i++) {
+                // Will replace a ? under index i + 1 with an object from params array under index i
                 preparedStatement.setObject(i + 1, params[i]);
             }
+            // Sens our parametrized query to the DB and returns ResultSet
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -54,9 +63,14 @@ public class DBUtilV2 {
         return null;
     }
 
+    //public static List<CustEmployee> query(String query, CustEmployee.class, Object... params) {
+    //public static List<Product> query(String query, Product.class, Object... params) {
+    // T -> The type that will be used in order to create objects
     public static <T> List<T> query(String query, Class<T> tClass, Object... params) {
         ResultSet resultSet = queryToRs(query, params);
         try {
+            // toBeanList() converts a result set into a list of objects of a specified class by
+            // populating class variables with the data from Result set
             return processor.toBeanList(resultSet, tClass);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -72,7 +86,6 @@ public class DBUtilV2 {
      */
     public static List<Map<String, Object>> query(String query, Object... params) {
         try {
-            openConnection();
             ResultSet resultSet = queryToRs(query, params);
             return getData(resultSet);
         } catch (SQLException e) {
